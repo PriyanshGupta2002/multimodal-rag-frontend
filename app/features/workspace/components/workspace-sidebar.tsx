@@ -60,7 +60,9 @@ type WorkspaceSidebarProps = {
   documentsLoading?: boolean;
   documentsError?: string;
   onDeleteDocument: (document: DocumentItem) => Promise<void>;
+  onDeleteDocuments: (documents: DocumentItem[]) => Promise<string[]>;
   deletingDocumentId?: string | null;
+  deletingDocuments?: boolean;
   threads: ThreadItem[];
   threadsLoading?: boolean;
   selectedDocumentId: string | null;
@@ -82,7 +84,9 @@ export function WorkspaceSidebar({
   documentsLoading,
   documentsError,
   onDeleteDocument,
+  onDeleteDocuments,
   deletingDocumentId,
+  deletingDocuments,
   threads,
   threadsLoading = false,
   selectedDocumentId,
@@ -251,7 +255,9 @@ export function WorkspaceSidebar({
           selectedId={selectedDocumentId}
           onSelect={onSelectDocument}
           onDelete={onDeleteDocument}
+          onDeleteDocuments={onDeleteDocuments}
           deletingDocumentId={deletingDocumentId}
+          deletingDocuments={deletingDocuments}
           isLoading={documentsLoading}
           error={documentsError}
         />

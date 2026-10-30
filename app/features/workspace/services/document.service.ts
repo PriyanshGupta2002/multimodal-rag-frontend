@@ -17,6 +17,23 @@ export async function deleteDocument(documentId: string): Promise<void> {
   );
 }
 
+export async function deleteDocuments(
+  documentIds: string[],
+): Promise<{ deletedDocumentIds: string[]; failedDocumentIds: string[] }> {
+  const results = await Promise.allSettled(
+    documentIds.map((documentId) => deleteDocument(documentId)),
+  );
+
+  return {
+    deletedDocumentIds: documentIds.filter(
+      (_, index) => results[index].status === "fulfilled",
+    ),
+    failedDocumentIds: documentIds.filter(
+      (_, index) => results[index].status === "rejected",
+    ),
+  };
+}
+
 export async function uploadDocument(
   file: File,
 ): Promise<UploadDocumentResponse> {

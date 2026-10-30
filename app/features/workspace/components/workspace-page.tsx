@@ -9,6 +9,7 @@ import { WorkspaceHeader } from "./workspace-header";
 import { ChatPanel } from "./chat-panel";
 import { useDocuments } from "../hooks/use-documents";
 import { useDeleteDocument } from "../hooks/use-delete-document";
+import { useDeleteDocuments } from "../hooks/use-delete-documents";
 import { useDeleteThread } from "../hooks/use-delete-thread";
 import { useUploadDocument } from "../hooks/use-upload-document";
 import { useUpdateThread } from "../hooks/use-update-thread";
@@ -42,6 +43,7 @@ export function WorkspacePage() {
   const uploadMutation = useUploadDocument();
   const deleteThreadMutation = useDeleteThread();
   const deleteDocumentMutation = useDeleteDocument();
+  const deleteDocumentsMutation = useDeleteDocuments();
   const documentsQuery = useDocuments();
   const updateThreadMutation = useUpdateThread();
 
@@ -173,6 +175,19 @@ export function WorkspacePage() {
     ],
   );
 
+  const handleDeleteDocuments = useCallback(
+    async (selectedDocuments: DocumentItem[]) => {
+      const result = await deleteDocumentsMutation.mutateAsync(
+        selectedDocuments.map((document) => document.id),
+      );
+      if (result.deletedDocumentIds.includes(selectedDocumentId ?? "")) {
+        handleSelectDocument(null);
+      }
+      return result.failedDocumentIds;
+    },
+    [deleteDocumentsMutation, handleSelectDocument, selectedDocumentId],
+  );
+
   const handleRenameThread = useCallback(
     async (id: string, title: string) => {
       const updatedThread = await updateThreadMutation.mutateAsync({
@@ -267,11 +282,13 @@ export function WorkspacePage() {
               : undefined
           }
           onDeleteDocument={handleDeleteDocument}
+          onDeleteDocuments={handleDeleteDocuments}
           deletingDocumentId={
             deleteDocumentMutation.isPending
               ? deleteDocumentMutation.variables
               : null
           }
+          deletingDocuments={deleteDocumentsMutation.isPending}
           threads={threads}
           threadsLoading={threadsLoading}
           selectedDocumentId={selectedDocumentId}

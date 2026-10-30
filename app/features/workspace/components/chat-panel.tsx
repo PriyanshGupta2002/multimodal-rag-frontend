@@ -1,6 +1,7 @@
 "use client";
 
-import { FileText, Sparkles, Square } from "lucide-react";
+import { Copy, FileText, Sparkles, Square } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ChatInput } from "./chat-input";
 import type { ChatMessage as ChatMessageType } from "../services/chat-service";
@@ -44,6 +45,15 @@ export function ChatPanel({
       container.scrollHeight - container.scrollTop - container.clientHeight;
 
     shouldAutoScrollRef.current = distanceFromBottom < 120;
+  }
+
+  async function handleCopyAnswer(content: string) {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(content));
+      toast.success("JSON-safe answer copied to clipboard.");
+    } catch {
+      toast.error("Could not copy the answer to your clipboard.");
+    }
   }
 
   useEffect(() => {
@@ -141,6 +151,20 @@ export function ChatPanel({
                         <MessageUsage usage={message.metadata.usage} />
                       </div>
                     )}
+                    {!isUser &&
+                      message.content &&
+                      !(streaming && isLastMessage) && (
+                        <div className="mt-2 flex justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyAnswer(message.content)}
+                          >
+                            <Copy />
+                            Copy JSON string
+                          </Button>
+                        </div>
+                      )}
                   </div>
                 </article>
               );
